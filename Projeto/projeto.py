@@ -1,7 +1,11 @@
+# Roberto Bezerra
+# Patryck Willyams de Lima
+
 import requests
 import deep_translator
 
 opcao = 0
+opcao2 = 0
 
 
 def linha(tamanho=40, char='='):
@@ -42,8 +46,9 @@ def menu_conselhos():
 def menu_traduzir():
     titulo('🌍 Tradução de Conselhos 🌍')
     print('''
-    [0] Traduzir Todos os Conselhos no Arquivo
+    [0] Traduzir Todos os Conselhos
     [1, 2, 3...] Traduzir Conselho Específico
+    [4] Traduzir Conselhos no Arquivo
     [5] ↩️ Voltar ao Menu Principal
     ''')
     escolher4 = int(input('Escolha o que deseja: '))
@@ -119,55 +124,117 @@ def traduzirtxt():
                 mensagem('📭 Nenhum conselho encontrado para traduzir.', 40)
     except FileNotFoundError:
         mensagem('📭 Arquivo não encontrado.', 40)
+    escolher5 = input('Deseja continuar traduzindo? [S/N]: ').strip().upper()
+    return escolher5
 
 def traduzir(opcao4, lista1):
-    if opcao4 > 0 and opcao4 <= len(lista1):
-        texto = lista1[opcao4 - 1]
-        traducao2 = deep_translator.GoogleTranslator(source='en', target='pt').translate(texto)
-        titulo('🌍 Conselho Traduzido 🌍')
-        print(f'{traducao2}\n')
-    else:
-        mensagem('⚠️ Conselho inválido ou inexistente.', 40)
+    try:
+        if opcao4 > 0 and opcao4 <= len(lista1):
+            texto = lista1[opcao4 - 1]
+            traducao2 = deep_translator.GoogleTranslator(source='en', target='pt').translate(texto)
+            titulo('🌍 Conselho Traduzido 🌍')
+            print(f'{traducao2}\n')
+        elif opcao4 == 0:
+            for c in range(len(lista1)):
+                texto = lista1[c - 1]
+                traducao2 = deep_translator.GoogleTranslator(source='en', target='pt').translate(texto)
+                if c == 0:
+                    titulo('🌍 Conselhos Traduzidos 🌍')
+                    print(f'{traducao2}\n')
+    except:
+            mensagem('⚠️ Conselho inválido ou inexistente.', 40)
     escolher5 = input('Deseja continuar traduzindo? [S/N]: ').strip().upper()
     return escolher5
 
 if __name__ == '__main__':
     while True:
-        opcao = menu()
-        if opcao == 1:
-            while True:
-                opcao2 = menu_conselhos()
-                if opcao2 == 4:
-                    break
-                lista1, lista2 = salvando_conselho(opcao2)
-                opcao3 = txt_conselho(lista1, lista2)
-                if opcao3 == 6:
-                    break
-                elif opcao3 == 7:
-                    mensagem('👋 Até mais!', 40)
-                    exit()
-                elif opcao3 == 5:
-                    while True:
-                        opcao4 = menu_traduzir()
-                        if opcao4 == 5:
-                            break
-                        elif opcao4 == 0:
-                            traduzirtxt()
-                        else:
-                            traduzir(opcao4, lista1)
+        opcao2 = 0
+        if opcao == 0:
+            opcao = menu()
+            if opcao == 1:
+                while True:
+                    if opcao2 == 4:
+                        opcao = 0
+                        break
+                    opcao2 = menu_conselhos()
+                    if opcao2 == 4:
+                        opcao = 0
+                        break
+                    lista1, lista2 = salvando_conselho(opcao2)
+                    opcao3 = txt_conselho(lista1, lista2)
+                    if opcao3 == 6:
+                        opcao = 0
+                        break
+                    elif opcao3 == 7:
+                        opcao = 4
+                        break
+                    elif opcao3 == 5:
+                        while True:
+                            opcao4 = menu_traduzir()
+                            if opcao4 == 5:
+                                opcao2 = 4
+                                break
+                            elif opcao4 == 0:
+                                opcao5 = traduzir(opcao4, lista1)
+                                if opcao5 in 'N':
+                                    opcao2 = 4
+                                    break
+                            elif opcao4 > 0 and opcao4 < 4:
+                                try:
+                                    opcao5 = traduzir(opcao4, lista1)
+                                    if opcao5 in 'N':
+                                        opcao2 = 4
+                                        opcao = 0
+                                        break
+                                except:
+                                    mensagem('⚠️ Conselho inválido ou inexistente.', 40)
+                                    opcao = 0
+                                    break
+                            
         elif opcao == 2:
-            traduz = ler_conselhos()
-            if traduz == 'S':
-                traduzirtxt()
+            while True:
+                traduz = ler_conselhos()
+                if traduz == 'S':
+                    opcao5 = traduzirtxt()
+                    if opcao5 in 'N':
+                            opcao = 0
+                            break
+                    elif opcao5 in 'S':
+                        opcao = 3
+                        break
         elif opcao == 3:
             while True:
                 opcao4 = menu_traduzir()
                 if opcao4 == 5:
+                    opcao = 0
                     break
-                elif opcao4 == 0:
-                    traduzirtxt()
-                else:
-                    traduzir(opcao4, [])
+                elif opcao4 == 4:
+                    opcao5 = traduzirtxt()
+                    if opcao5 in 'N':
+                                opcao = 0
+                                break
+                    elif opcao4 == 0:
+                        try:
+                            opcao5 = traduzir(opcao4, lista1)
+                            if opcao5 in 'N':
+                                opcao2 = 4
+                                opcao = 0
+                                break
+                        except:
+                            mensagem('⚠️ Conselho inválido ou inexistente.', 40)
+                            opcao = 0
+                            break
+                elif opcao4 > 0 and opcao4 < 4:
+                    try:
+                            opcao5 = traduzir(opcao4, lista1)
+                            if opcao5 in 'N':
+                                opcao2 = 4
+                                opcao = 0
+                                break
+                    except:
+                            mensagem('⚠️ Conselho inválido ou inexistente.', 40)
+                            opcao = 0
+                            break
         elif opcao == 4:
             mensagem('👋 Até mais! Volte sempre!', 40)
             break
